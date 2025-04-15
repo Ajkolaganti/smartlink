@@ -37,7 +37,7 @@ export default function LinkConverter() {
           return;
         }
 
-        const smartUrl = `${window.location.origin}/youtube/${videoId}`;
+        const smartUrl = `https://smartlink-converter.vercel.app/youtube/${videoId}`;
         const webUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
         const generatedLink: SmartLink = {
@@ -76,7 +76,7 @@ export default function LinkConverter() {
           return;
         }
 
-        const smartUrl = `${window.location.origin}/twitter/${tweetId}`;
+        const smartUrl = `https://smartlink-converter.vercel.app/twitter/${tweetId}`;
         const webUrl = `https://twitter.com/i/status/${tweetId}`;
 
         const generatedLink: SmartLink = {
@@ -95,7 +95,7 @@ export default function LinkConverter() {
           return;
         }
 
-        const smartUrl = `${window.location.origin}/tiktok/${videoId}`;
+        const smartUrl = `https://smartlink-converter.vercel.app/tiktok/${videoId}`;
         const webUrl = `https://www.tiktok.com/t/${videoId}`;
 
         const generatedLink: SmartLink = {
