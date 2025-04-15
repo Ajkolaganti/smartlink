@@ -4,19 +4,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/youtube/.*",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/twitter/.*",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/tiktok/.*",
-      "dest": "/index.html"
-    }
   ]
 } 
