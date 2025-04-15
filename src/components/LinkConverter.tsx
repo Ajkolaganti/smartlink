@@ -14,8 +14,9 @@ export default function LinkConverter() {
 
   const generateSmartLink = async () => {
     setError('');
-    const validation = validateUrl(url);
+    setSmartLink(null);
     
+    const validation = validateUrl(url);
     if (!validation.isValid) {
       setError(validation.message);
       return;
@@ -23,24 +24,103 @@ export default function LinkConverter() {
 
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const urlObj = new URL(url);
+      const domain = urlObj.hostname.replace('www.', '');
       
-      // Generate a unique identifier for the link
-      const linkId = Math.random().toString(36).substring(2, 15);
-      const generatedLink: SmartLink = {
-        originalUrl: url,
-        smartUrl: `https://demo-smart.link/${linkId}`,
-        timestamp: Date.now()
-      };
+      if (domain === 'youtube.com' || domain === 'youtu.be') {
+        const videoId = domain === 'youtube.com' 
+          ? urlObj.searchParams.get('v') 
+          : urlObj.pathname.slice(1);
 
-      setSmartLink(generatedLink);
-      saveLink(generatedLink);
-      trackConversion(url);
+        if (!videoId) {
+          setError('Invalid YouTube URL. Please check the URL and try again.');
+          return;
+        }
+
+        const smartUrl = `${window.location.origin}/youtube/${videoId}`;
+        const webUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+        const generatedLink: SmartLink = {
+          originalUrl: url,
+          smartUrl,
+          fallbackUrl: webUrl,
+          timestamp: Date.now()
+        };
+
+        setSmartLink(generatedLink);
+        saveLink(generatedLink);
+        trackConversion(url);
+      } else if (domain === 'instagram.com') {
+        const paths = urlObj.pathname.split('/').filter(Boolean);
+        if (paths.length < 2) {
+          setError('Invalid Instagram URL. Please check the URL and try again.');
+          return;
+        }
+        
+        const smartUrl = `instagram://media?id=${paths[1]}`;
+        const webUrl = `https://instagram.com/p/${paths[1]}`;
+        
+        const generatedLink: SmartLink = {
+          originalUrl: url,
+          smartUrl,
+          fallbackUrl: webUrl,
+          timestamp: Date.now()
+        };
+        setSmartLink(generatedLink);
+        saveLink(generatedLink);
+        trackConversion(url);
+      } else if (domain === 'twitter.com' || domain === 'x.com') {
+        const tweetId = urlObj.pathname.split('/').pop();
+        if (!tweetId) {
+          setError('Invalid Twitter URL. Please check the URL and try again.');
+          return;
+        }
+
+        const smartUrl = `${window.location.origin}/twitter/${tweetId}`;
+        const webUrl = `https://twitter.com/i/status/${tweetId}`;
+
+        const generatedLink: SmartLink = {
+          originalUrl: url,
+          smartUrl,
+          fallbackUrl: webUrl,
+          timestamp: Date.now()
+        };
+        setSmartLink(generatedLink);
+        saveLink(generatedLink);
+        trackConversion(url);
+      } else if (domain === 'tiktok.com') {
+        const videoId = urlObj.pathname.split('/').pop();
+        if (!videoId) {
+          setError('Invalid TikTok URL. Please check the URL and try again.');
+          return;
+        }
+
+        const smartUrl = `${window.location.origin}/tiktok/${videoId}`;
+        const webUrl = `https://www.tiktok.com/t/${videoId}`;
+
+        const generatedLink: SmartLink = {
+          originalUrl: url,
+          smartUrl,
+          fallbackUrl: webUrl,
+          timestamp: Date.now()
+        };
+        setSmartLink(generatedLink);
+        saveLink(generatedLink);
+        trackConversion(url);
+      }
     } catch (err) {
-      setError('Failed to generate smart link. Please try again.');
+      console.error('Link generation error:', err);
+      setError('Failed to generate smart link. Please check the URL and try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const openSmartLink = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (!smartLink) return;
+
+    window.location.href = smartLink.smartUrl;
   };
 
   const copyToClipboard = async () => {
@@ -112,8 +192,7 @@ export default function LinkConverter() {
 
           <a
             href={smartLink.smartUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={openSmartLink}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors px-4 py-2 rounded-lg hover:bg-blue-50"
           >
             <ExternalLink size={20} />

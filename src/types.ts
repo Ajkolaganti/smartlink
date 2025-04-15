@@ -1,6 +1,8 @@
 export interface SmartLink {
   originalUrl: string;
   smartUrl: string;
+  iosUrl?: string;
+  fallbackUrl?: string;
   timestamp: number;
 }
 
